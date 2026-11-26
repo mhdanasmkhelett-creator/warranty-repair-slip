@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Create and print a warranty return slip for repair.">
+  <title>Warranty Repair Slip</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #111;
+      background: #f3f4f6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 28px 16px;
+    }
+
+    .app {
+      width: min(100%, 780px);
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.65rem;
+    }
+
+    .intro {
+      margin: 0 0 22px;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    .panel {
+      padding: 22px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 4px 16px rgb(0 0 0 / 5%);
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+
+    label { font-size: .95rem; font-weight: 700; }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #9ca3af;
+      border-radius: 7px;
+      background: #fff;
+      color: #111;
+      font: inherit;
+    }
+
+    textarea { min-height: 78px; resize: vertical; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      grid-column: 1 / -1;
+      margin-top: 2px;
+    }
+
+    button {
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 0;
+      border-radius: 7px;
+      background: #111827;
+      color: white;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover { background: #374151; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid #60a5fa;
+      outline-offset: 2px;
+    }
+
+    .privacy-note { margin: 0; color: #4b5563; font-size: .9rem; }
+
+    /* The reference image is landscape: 6 inches wide by 4 inches high. */
+    .print-slip {
+      display: none;
+      width: 6in;
+      height: 4in;
+      padding: .38in .48in;
+      border: 1px solid #bfc3c7;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .slip-spacer { height: .88in; }
+    .slip-title {
+      margin: 0;
+      text-align: center;
+      font-size: 16pt;
+      line-height: 1.25;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .slip-subtitle {
+      margin: 7px 0 10px;
+      text-align: center;
+      font-size: 16pt;
+      line-height: 1.2;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .slip-details {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 16pt;
+      line-height: 1.25;
+    }
+    .slip-details li {
+      display: grid;
+      grid-template-columns: 24px auto 1fr;
+      align-items: baseline;
+      column-gap: 5px;
+      white-space: normal;
+    }
+    .arrow { font-size: 17pt; }
+    .slip-label { font-weight: 700; white-space: nowrap; }
+    .slip-value {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    @page { size: 6in 4in; margin: 0; }
+    @media print {
+      html, body {
+        width: 6in;
+        height: 4in;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+      }
+      body { min-height: 0; }
+      .app { display: none !important; }
+      .print-slip {
+        display: block !important;
+        border: 1px solid #bfc3c7;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body { padding: 18px 12px; }
+      .panel { padding: 16px; }
+      form { grid-template-columns: 1fr; }
+      .field.full, .actions { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>Warranty Return Slip</h1>
+    <p class="intro">Enter the repair details, then print a 6 × 4 inch slip. Nothing is saved or sent anywhere.</p>
+
+    <section class="panel" aria-label="Repair slip details">
+      <form id="repair-form">
+        <div class="field">
+          <label for="customer">Customer name</label>
+          <input id="customer" name="customer" autocomplete="name" required maxlength="70" placeholder="e.g. Kumar Anuj">
+        </div>
+        <div class="field">
+          <label for="product">Product name / SKU</label>
+          <input id="product" name="product" required maxlength="70" placeholder="e.g. H30clite">
+        </div>
+        <div class="field full">
+          <label for="issue">Issue type</label>
+          <input id="issue" name="issue" list="issue-options" required maxlength="100" placeholder="Choose or type an issue">
+          <datalist id="issue-options">
+            <option value="Printer head quality issue"></option>
+            <option value="Printing issue"></option>
+            <option value="Paper feed issue"></option>
+            <option value="Connectivity issue"></option>
+            <option value="Power issue"></option>
+            <option value="Other"></option>
+          </datalist>
+        </div>
+        <div class="actions">
+          <button type="submit">Print 4 × 6 slip</button>
+          <p class="privacy-note">Print-only: details are not stored by this app.</p>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <article class="print-slip" aria-label="Warranty return slip for repair">
+    <div class="slip-spacer" aria-hidden="true"></div>
+    <h2 class="slip-title">Warranty Return Slip</h2>
+    <p class="slip-subtitle">For Repair</p>
+    <ul class="slip-details">
+      <li><span class="arrow" aria-hidden="true">➢</span><span class="slip-label">Customer Name :</span><span class="slip-value" id="print-customer"></span></li>
+      <li><span class="arrow" aria-hidden="true">➢</span><span class="slip-label">Product Name :</span><span class="slip-value" id="print-product"></span></li>
+      <li><span class="arrow" aria-hidden="true">➢</span><span class="slip-label">Issue Type :</span><span class="slip-value" id="print-issue"></span></li>
+    </ul>
+  </article>
+
+  <script>
+    const form = document.getElementById('repair-form');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+
+      document.getElementById('print-customer').textContent = document.getElementById('customer').value.trim();
+      document.getElementById('print-product').textContent = document.getElementById('product').value.trim();
+      document.getElementById('print-issue').textContent = document.getElementById('issue').value.trim();
+      window.print();
+    });
+  </script>
+</body>
+</html>
